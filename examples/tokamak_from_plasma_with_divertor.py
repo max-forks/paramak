@@ -1,5 +1,6 @@
-import paramak
 from cadquery import Workplane
+
+import paramak
 
 # makes a rectangle that overlaps the lower blanket under the plasma
 # the intersection of this and the layers will form the lower divertor
@@ -29,4 +30,3 @@ my_reactor = paramak.tokamak_from_plasma(
 )
 my_reactor.save(f"tokamak_with_divertor.step")
 print(f"Saved as tokamak_with_divertor.step")
-

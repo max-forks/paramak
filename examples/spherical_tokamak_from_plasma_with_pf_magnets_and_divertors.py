@@ -3,11 +3,17 @@ import paramak
 rotation_angle = 180
 poloidal_field_coils = []
 for case_thickness, height, width, center_point in zip(
-    [10, 15, 15, 10], [20, 50, 50, 20], [20, 50, 50, 20], [(500, 300), (560, 100), (560, -100), (500, -300)]
+    [10, 15, 15, 10],
+    [20, 50, 50, 20],
+    [20, 50, 50, 20],
+    [(500, 300), (560, 100), (560, -100), (500, -300)],
 ):
     poloidal_field_coils.append(
         paramak.poloidal_field_coil(
-            height=height, width=width, center_point=center_point, rotation_angle=rotation_angle
+            height=height,
+            width=width,
+            center_point=center_point,
+            rotation_angle=rotation_angle,
         )
     )
     poloidal_field_coils.append(

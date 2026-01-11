@@ -27,15 +27,29 @@ def poloidal_field_coil(
     """
 
     points = [
-        (center_point[0] + width / 2.0, center_point[1] + height / 2.0, "straight"),  # upper right
-        (center_point[0] + width / 2.0, center_point[1] - height / 2.0, "straight"),  # lower right
-        (center_point[0] - width / 2.0, center_point[1] - height / 2.0, "straight"),  # lower left
+        (
+            center_point[0] + width / 2.0,
+            center_point[1] + height / 2.0,
+            "straight",
+        ),  # upper right
+        (
+            center_point[0] + width / 2.0,
+            center_point[1] - height / 2.0,
+            "straight",
+        ),  # lower right
+        (
+            center_point[0] - width / 2.0,
+            center_point[1] - height / 2.0,
+            "straight",
+        ),  # lower left
         (center_point[0] - width / 2.0, center_point[1] + height / 2.0, "straight"),
     ]
 
     points.append(points[0])
 
-    wire = create_wire_workplane_from_points(points=points, plane=plane, origin=origin, obj=obj)
+    wire = create_wire_workplane_from_points(
+        points=points, plane=plane, origin=origin, obj=obj
+    )
 
     solid = wire.revolve(rotation_angle)
     solid.name = name

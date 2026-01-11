@@ -2,10 +2,15 @@ import paramak
 
 extra_cut_shapes = []
 for case_thickness, height, width, center_point in zip(
-    [10, 15, 15, 10], [20, 50, 50, 20], [20, 50, 50, 20], [(700, 300), (800, 100), (800, -100), (700, -300)]
+    [10, 15, 15, 10],
+    [20, 50, 50, 20],
+    [20, 50, 50, 20],
+    [(700, 300), (800, 100), (800, -100), (700, -300)],
 ):
     extra_cut_shapes.append(
-        paramak.poloidal_field_coil(height=height, width=width, center_point=center_point, rotation_angle=180)
+        paramak.poloidal_field_coil(
+            height=height, width=width, center_point=center_point, rotation_angle=180
+        )
     )
     extra_cut_shapes.append(
         paramak.poloidal_field_coil_case(
@@ -50,4 +55,3 @@ my_reactor = paramak.tokamak(
 
 my_reactor.save(f"tokamak_minimal.step")
 print(f"Saved as tokamak_minimal.step")
-

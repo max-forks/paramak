@@ -1,11 +1,12 @@
-import warnings
 import typing
+import warnings
 
-from ..utils import create_wire_workplane_from_points
 import mpmath
 import numpy as np
 import sympy as sp
 from scipy.interpolate import interp1d
+
+from ..utils import create_wire_workplane_from_points
 
 
 def make_callable(attribute, start_angle, stop_angle):
@@ -15,7 +16,11 @@ def make_callable(attribute, start_angle, stop_angle):
     # if the attribute is a list, create a interpolated object of the
     # values
     if isinstance(attribute, (tuple, list)):
-        if isinstance(attribute[0], (tuple, list)) and isinstance(attribute[1], (tuple, list)) and len(attribute) == 2:
+        if (
+            isinstance(attribute[0], (tuple, list))
+            and isinstance(attribute[1], (tuple, list))
+            and len(attribute) == 2
+        ):
             # attribute is a list of 2 lists
             if len(attribute[0]) != len(attribute[1]):
                 raise ValueError(
@@ -27,7 +32,9 @@ def make_callable(attribute, start_angle, stop_angle):
         else:
             # no list of angles is given
             offset_values = attribute
-            list_of_angles = np.linspace(start_angle, stop_angle, len(offset_values), endpoint=True)
+            list_of_angles = np.linspace(
+                start_angle, stop_angle, len(offset_values), endpoint=True
+            )
         interpolated_values = interp1d(list_of_angles, offset_values)
 
     def fun(theta):
@@ -107,7 +114,10 @@ def find_points(
     # assemble
     points = inner_points + outer_points
     if overlapping_shape and allow_overlapping_shape is False:
-        msg = "blanket_from_plasma: Some points with negative R coordinate have " "been ignored."
+        msg = (
+            "blanket_from_plasma: Some points with negative R coordinate have "
+            "been ignored."
+        )
         warnings.warn(msg, category=UserWarning)
 
     # input()
@@ -197,7 +207,15 @@ def create_offset_points(
     return points, overlapping_shape
 
 
-def distribution(major_radius, minor_radius, triangularity, elongation, vertical_displacement, theta, pkg=np):
+def distribution(
+    major_radius,
+    minor_radius,
+    triangularity,
+    elongation,
+    vertical_displacement,
+    theta,
+    pkg=np,
+):
     """Plasma distribution theta in degrees
 
     Args:
@@ -294,7 +312,9 @@ def blanket_from_plasma(
     )
     points.append(points[0])
 
-    wire = create_wire_workplane_from_points(points=points, plane=plane, origin=origin, obj=obj)
+    wire = create_wire_workplane_from_points(
+        points=points, plane=plane, origin=origin, obj=obj
+    )
 
     solid = wire.revolve(rotation_angle)
     solid.name = name

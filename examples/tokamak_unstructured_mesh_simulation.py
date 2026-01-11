@@ -8,12 +8,12 @@ mesh and an unstructured mesh to use in an unstructured mesh tally. The script
 uses minimal materials, tallies, source to keep the example concise.
 """
 
-
-import paramak
-import openmc
-from cad_to_dagmc import CadToDagmc
 from pathlib import Path
 
+import openmc
+from cad_to_dagmc import CadToDagmc
+
+import paramak
 
 openmc.config["cross_sections"] = "/nuclear_data/cross_sections.xml"
 
@@ -47,7 +47,9 @@ my_reactor = paramak.tokamak(
     rotation_angle=180,
 )
 
-my_reactor = my_reactor.remove(name="plasma")  # removing as we don't need the plasma for this neutronics simulation
+my_reactor = my_reactor.remove(
+    name="plasma"
+)  # removing as we don't need the plasma for this neutronics simulation
 
 my_model = CadToDagmc()
 # as inner and outer layers are one solid there are only 6 solids in model
@@ -82,7 +84,9 @@ mat_layer_5.add_nuclide("Fe56", 1, "ao")
 mat_layer_5.set_density("g/cm3", 7)
 
 
-materials = openmc.Materials([mat_layer_1, mat_layer_2, mat_layer_3, mat_layer_4, mat_layer_5])
+materials = openmc.Materials(
+    [mat_layer_1, mat_layer_2, mat_layer_3, mat_layer_4, mat_layer_5]
+)
 
 
 dag_univ = openmc.DAGMCUniverse(filename=h5m_filename)
@@ -91,7 +95,9 @@ dag_univ = openmc.DAGMCUniverse(filename=h5m_filename)
 bbox = dag_univ.bounding_box
 dagmc_radius = max(abs(bbox[0][0]), abs(bbox[0][1]), abs(bbox[1][0]), abs(bbox[1][1]))
 
-cylinder_surface = openmc.ZCylinder(r=dagmc_radius, boundary_type="vacuum", surface_id=1000)
+cylinder_surface = openmc.ZCylinder(
+    r=dagmc_radius, boundary_type="vacuum", surface_id=1000
+)
 lower_z = openmc.ZPlane(bbox[0][2], boundary_type="vacuum", surface_id=1003)
 upper_z = openmc.ZPlane(bbox[1][2], boundary_type="vacuum", surface_id=1004)
 
@@ -119,7 +125,9 @@ z_values = openmc.stats.Discrete([0], [1])
 angle = openmc.stats.Uniform(a=0.0, b=2 * 3.14159265359)
 
 # this makes the ring source using the three distributions and a radius
-my_source.space = openmc.stats.CylindricalIndependent(r=radius, phi=angle, z=z_values, origin=(0.0, 0.0, 0.0))
+my_source.space = openmc.stats.CylindricalIndependent(
+    r=radius, phi=angle, z=z_values, origin=(0.0, 0.0, 0.0)
+)
 
 # sets the direction to isotropic
 my_source.angle = openmc.stats.Isotropic()
@@ -129,9 +137,13 @@ my_source.energy = openmc.stats.muir(e0=14080000.0, m_rat=5.0, kt=20000.0)
 
 
 # specifies the simulation computational intensity
-settings = openmc.Settings(batches=10, particles=10000, run_mode="fixed source", source=my_source)
+settings = openmc.Settings(
+    batches=10, particles=10000, run_mode="fixed source", source=my_source
+)
 
-mesh = openmc.UnstructuredMesh(filename="unstructured_mesh.vtk", library="moab", mesh_id=1)
+mesh = openmc.UnstructuredMesh(
+    filename="unstructured_mesh.vtk", library="moab", mesh_id=1
+)
 
 # adds a tally to record the heat deposited in entire geometry
 mesh_tally = openmc.Tally(name="flux")
@@ -142,7 +154,9 @@ mesh_tally.scores = ["flux"]
 tallies = openmc.Tallies([mesh_tally])
 
 # builds the openmc model
-my_model = openmc.Model(materials=materials, geometry=geometry, settings=settings, tallies=tallies)
+my_model = openmc.Model(
+    materials=materials, geometry=geometry, settings=settings, tallies=tallies
+)
 
 # starts the simulation
 output_file = my_model.run()

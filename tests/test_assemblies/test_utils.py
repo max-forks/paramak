@@ -89,7 +89,9 @@ def transport_particles_on_h5m_geometry(
     tallies = openmc.Tallies([cell_tally])
 
     # builds the openmc model
-    my_model = openmc.Model(materials=materials, geometry=geometry, settings=settings, tallies=tallies)
+    my_model = openmc.Model(
+        materials=materials, geometry=geometry, settings=settings, tallies=tallies
+    )
 
     # starts the simulation
     output_file = my_model.run()

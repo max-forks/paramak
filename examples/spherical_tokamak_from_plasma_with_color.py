@@ -18,7 +18,7 @@ my_reactor = paramak.spherical_tokamak_from_plasma(
     colors={
         "layer_1": (0.4, 0.9, 0.4),
         "layer_2": (0.6, 0.8, 0.6),
-        "plasma": (1., 0.7, 0.8, 0.6),
+        "plasma": (1.0, 0.7, 0.8, 0.6),
         "layer_3": (0.1, 0.1, 0.9),
         "layer_4": (0.4, 0.4, 0.8),
         "layer_5": (0.5, 0.5, 0.8),
@@ -39,14 +39,14 @@ my_reactor.toCompound().export("spherical_tokamak_from_plasma_with_colors.svg")
 # first install plugin with
 # pip install git+https://github.com/jmwright/cadquery-png-plugin
 import cadquery_png_plugin.plugin
+
 # lots of options
 # https://github.com/jmwright/cadquery-png-plugin/blob/d2dd6e8a51b7e165ee80240a701c5b434dfe0733/cadquery_png_plugin/plugin.py#L276-L298
 my_reactor.exportPNG(
     options={
-        "width":1280,
-        "height":1024,
-        "zoom":1.4,
+        "width": 1280,
+        "height": 1024,
+        "zoom": 1.4,
     },
-    file_path='spherical_tokamak_from_plasma_with_colors.png'
+    file_path="spherical_tokamak_from_plasma_with_colors.png",
 )
-

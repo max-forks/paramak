@@ -1,23 +1,30 @@
 from typing import Optional, Sequence, Tuple, Union
 
 import cadquery as cq
-from .assembly import Assembly
 
 from ..utils import (
+    LayerType,
     get_plasma_index,
     get_plasma_value,
+    sum_before_after_plasma,
     sum_up_to_gap_before_plasma,
     sum_up_to_plasma,
-    sum_before_after_plasma,
-    LayerType,
 )
 from ..workplanes.blanket_from_plasma import blanket_from_plasma
 from ..workplanes.center_column_shield_cylinder import center_column_shield_cylinder
 from ..workplanes.plasma_simplified import plasma_simplified
+from .assembly import Assembly
 
 
 def create_blanket_layers_after_plasma(
-    radial_build, vertical_build, minor_radius, major_radius, triangularity, elongation, rotation_angle, center_column
+    radial_build,
+    vertical_build,
+    minor_radius,
+    major_radius,
+    triangularity,
+    elongation,
+    rotation_angle,
+    center_column,
 ):
     layers = []
     cumulative_thickness_rb = 0
@@ -57,7 +64,7 @@ def create_blanket_layers_after_plasma(
             stop_angle=90,
             rotation_angle=rotation_angle,
             color=(0.5, 0.5, 0.5),
-            name=f"layer_{plasma_index_radial+i+1}",
+            name=f"layer_{plasma_index_radial + i + 1}",
             allow_overlapping_shape=True,
             connect_to_center=True,
         )
@@ -118,7 +125,7 @@ def spherical_tokamak_from_plasma(
     Args:
 
         radial_build: sequence of tuples containing the radial build of the
-            reactor. Each tuple should contain a LayerType and a float 
+            reactor. Each tuple should contain a LayerType and a float
         elongation (float, optional): _description_. Defaults to 2.0.
         triangularity (float, optional): _description_. Defaults to 0.55.
         rotation_angle (Optional[str], optional): _description_. Defaults to 180.0.
@@ -148,7 +155,11 @@ def spherical_tokamak_from_plasma(
 
     plasma_height = 2 * minor_radius * elongation
     # slice opperation reverses the list and removes the last value to avoid two plasmas
-    vertical_build = upper_vertical_build[::-1][:-1] + [(LayerType.PLASMA, plasma_height)] + upper_vertical_build[1:]
+    vertical_build = (
+        upper_vertical_build[::-1][:-1]
+        + [(LayerType.PLASMA, plasma_height)]
+        + upper_vertical_build[1:]
+    )
 
     return spherical_tokamak(
         radial_build=radial_build,
@@ -170,12 +181,12 @@ def spherical_tokamak(
     extra_intersect_shapes: Sequence[cq.Workplane] = [],
     colors: dict = {},
 ) -> Assembly:
-    """  Creates a spherical tokamak fusion reactor from a radial build and vertical build.
+    """Creates a spherical tokamak fusion reactor from a radial build and vertical build.
 
     Args:
 
         radial_build: sequence of tuples containing the radial build of the
-            reactor. Each tuple should contain a LayerType and a float 
+            reactor. Each tuple should contain a LayerType and a float
         elongation (float, optional): _description_. Defaults to 2.0.
         triangularity (float, optional): _description_. Defaults to 0.55.
         rotation_angle (Optional[str], optional): _description_. Defaults to 180.0.
@@ -239,12 +250,15 @@ def spherical_tokamak(
     my_assembly = Assembly()
 
     for i, entry in enumerate(extra_cut_shapes):
-
         if isinstance(entry, cq.Workplane):
-            name = f"add_extra_cut_shape_{i+1}"
-            my_assembly.add(entry, name=name, color=cq.Color(*colors.get(name, (0.5,0.5,0.5))))
+            name = f"add_extra_cut_shape_{i + 1}"
+            my_assembly.add(
+                entry, name=name, color=cq.Color(*colors.get(name, (0.5, 0.5, 0.5)))
+            )
         else:
-            raise ValueError(f"extra_cut_shapes should only contain cadquery Workplanes, not {type(entry)}")
+            raise ValueError(
+                f"extra_cut_shapes should only contain cadquery Workplanes, not {type(entry)}"
+            )
 
     # builds up the intersect shapes
     intersect_shapes_to_cut = []
@@ -262,14 +276,20 @@ def spherical_tokamak(
         for i, entry in enumerate(extra_intersect_shapes):
             reactor_entry_intersection = entry.intersect(reactor_compound)
             intersect_shapes_to_cut.append(reactor_entry_intersection)
-            name = f"extra_intersect_shapes_{i+1}"
-            my_assembly.add(reactor_entry_intersection, name=name, color=cq.Color(*colors.get(name, (0.5,0.5,0.5))))
+            name = f"extra_intersect_shapes_{i + 1}"
+            my_assembly.add(
+                reactor_entry_intersection,
+                name=name,
+                color=cq.Color(*colors.get(name, (0.5, 0.5, 0.5))),
+            )
 
     # builds just the core if there are no extra parts
     if len(extra_cut_shapes) == 0 and len(intersect_shapes_to_cut) == 0:
-        for i, entry in enumerate(inner_radial_build+blanket_layers):
-            name = f"layer_{i+1}"
-            my_assembly.add(entry, name=name, color=cq.Color(*colors.get(name, (0.5,0.5,0.5))))
+        for i, entry in enumerate(inner_radial_build + blanket_layers):
+            name = f"layer_{i + 1}"
+            my_assembly.add(
+                entry, name=name, color=cq.Color(*colors.get(name, (0.5, 0.5, 0.5)))
+            )
     else:
         shapes_and_components = []
         for i, entry in enumerate(inner_radial_build + blanket_layers):
@@ -282,10 +302,14 @@ def spherical_tokamak(
 
         for i, entry in enumerate(shapes_and_components):
             # TODO track the names of shapes, even when extra shapes are made due to splitting
-            name=f"layer_{i+1}"
-            my_assembly.add(entry, name=name, color=cq.Color(*colors.get(name, (0.5,0.5,0.5))))
+            name = f"layer_{i + 1}"
+            my_assembly.add(
+                entry, name=name, color=cq.Color(*colors.get(name, (0.5, 0.5, 0.5)))
+            )
 
-    my_assembly.add(plasma, name="plasma", color=cq.Color(*colors.get("plasma", (0.5,0.5,0.5))))
+    my_assembly.add(
+        plasma, name="plasma", color=cq.Color(*colors.get("plasma", (0.5, 0.5, 0.5)))
+    )
 
     my_assembly.elongation = elongation
     my_assembly.triangularity = triangularity

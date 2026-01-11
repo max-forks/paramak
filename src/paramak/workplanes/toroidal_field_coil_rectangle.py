@@ -80,9 +80,13 @@ def toroidal_field_coil_rectangle(
     ]
 
     # adds any vertical displacement and the connection type to the points
-    points = [(point[0], point[1] + vertical_displacement, "straight") for point in points]
+    points = [
+        (point[0], point[1] + vertical_displacement, "straight") for point in points
+    ]
 
-    wire = create_wire_workplane_from_points(points=points, plane=plane, origin=origin, obj=obj)
+    wire = create_wire_workplane_from_points(
+        points=points, plane=plane, origin=origin, obj=obj
+    )
     solid = wire.extrude(until=distance / 2, both=True)
     solid = rotate_solid(angles=azimuthal_placement_angles, solid=solid)
 
@@ -103,9 +107,15 @@ def toroidal_field_coil_rectangle(
 
     if rotation_angle < 360.0:
         bb = solid.val().BoundingBox()
-        radius = max(bb.xmax, bb.ymax) * 1.1  # 10% larger than the bounding box to ensure clean cut
-        height = max(bb.zmax, bb.zmin) * 2.1  # 10% larger than the bounding box to ensure clean cut
-        cutting_shape = cutting_wedge(height=height, radius=radius, rotation_angle=rotation_angle)
+        radius = (
+            max(bb.xmax, bb.ymax) * 1.1
+        )  # 10% larger than the bounding box to ensure clean cut
+        height = (
+            max(bb.zmax, bb.zmin) * 2.1
+        )  # 10% larger than the bounding box to ensure clean cut
+        cutting_shape = cutting_wedge(
+            height=height, radius=radius, rotation_angle=rotation_angle
+        )
         solid = solid.intersect(cutting_shape)
 
     solid.name = name

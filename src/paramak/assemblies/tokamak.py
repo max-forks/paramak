@@ -1,12 +1,12 @@
 from typing import Sequence, Tuple
 
 import cadquery as cq
-from .assembly import Assembly
 
-from ..utils import get_plasma_index, LayerType
+from ..utils import LayerType, get_plasma_index
 from ..workplanes.blanket_from_plasma import blanket_from_plasma
 from ..workplanes.center_column_shield_cylinder import center_column_shield_cylinder
 from ..workplanes.plasma_simplified import plasma_simplified
+from .assembly import Assembly
 from .spherical_tokamak import get_plasma_value, sum_up_to_plasma
 
 
@@ -27,7 +27,9 @@ def count_cylinder_layers(radial_build):
     return before_plasma - after_plasma
 
 
-def create_center_column_shield_cylinders(radial_build, rotation_angle, center_column_shield_height):
+def create_center_column_shield_cylinders(
+    radial_build, rotation_angle, center_column_shield_height
+):
     cylinders = []
     total_sum = 0
     layer_count = 0
@@ -70,9 +72,15 @@ def distance_to_plasma(radial_build, index):
 
 
 def create_layers_from_plasma(
-    radial_build, vertical_build, minor_radius, major_radius, triangularity, elongation, rotation_angle, center_column
+    radial_build,
+    vertical_build,
+    minor_radius,
+    major_radius,
+    triangularity,
+    elongation,
+    rotation_angle,
+    center_column,
 ):
-
     plasma_index_rb = get_plasma_index(radial_build)
     plasma_index_vb = get_plasma_index(vertical_build)
     indexes_from_plamsa_to_end = len(radial_build) - plasma_index_rb
@@ -83,7 +91,6 @@ def create_layers_from_plasma(
     cumulative_thickness_uvb = 0
     cumulative_thickness_lvb = 0
     for index_delta in range(indexes_from_plamsa_to_end):
-
         if radial_build[plasma_index_rb + index_delta][0] == LayerType.PLASMA:
             continue
         outer_layer_thickness = radial_build[plasma_index_rb + index_delta][1]
@@ -105,8 +112,16 @@ def create_layers_from_plasma(
                 major_radius=major_radius,
                 triangularity=triangularity,
                 elongation=elongation,
-                thickness=[upper_layer_thickness, outer_layer_thickness, lower_layer_thickness],
-                offset_from_plasma=[cumulative_thickness_uvb, cumulative_thickness_orb, cumulative_thickness_lvb],
+                thickness=[
+                    upper_layer_thickness,
+                    outer_layer_thickness,
+                    lower_layer_thickness,
+                ],
+                offset_from_plasma=[
+                    cumulative_thickness_uvb,
+                    cumulative_thickness_orb,
+                    cumulative_thickness_lvb,
+                ],
                 start_angle=90,
                 stop_angle=-90,
                 rotation_angle=rotation_angle,
@@ -157,7 +172,7 @@ def tokamak_from_plasma(
     rotation_angle: float = 180.0,
     extra_cut_shapes: Sequence[cq.Workplane] = [],
     extra_intersect_shapes: Sequence[cq.Workplane] = [],
-    colors: dict = {}
+    colors: dict = {},
 ) -> Assembly:
     """
     Creates a tokamak fusion reactor from a radial build and plasma parameters.
@@ -191,12 +206,20 @@ def tokamak_from_plasma(
 
     # make vertical build from inner radial build
     pi = get_plasma_index(radial_build)
-    rbi = len(radial_build) - 1 - pi  # number of unique entries in outer or inner radial build
-    upper_vertical_build = radial_build[pi - rbi : pi][::-1]  # get the inner radial build
+    rbi = (
+        len(radial_build) - 1 - pi
+    )  # number of unique entries in outer or inner radial build
+    upper_vertical_build = radial_build[pi - rbi : pi][
+        ::-1
+    ]  # get the inner radial build
 
     plasma_height = 2 * minor_radius * elongation
     # slice opperation reverses the list and removes the last value to avoid two plasmas
-    vertical_build = upper_vertical_build[::-1] + [(LayerType.PLASMA, plasma_height)] + upper_vertical_build
+    vertical_build = (
+        upper_vertical_build[::-1]
+        + [(LayerType.PLASMA, plasma_height)]
+        + upper_vertical_build
+    )
 
     return tokamak(
         radial_build=radial_build,
@@ -205,7 +228,7 @@ def tokamak_from_plasma(
         rotation_angle=rotation_angle,
         extra_cut_shapes=extra_cut_shapes,
         extra_intersect_shapes=extra_intersect_shapes,
-        colors=colors
+        colors=colors,
     )
 
 
@@ -216,16 +239,16 @@ def tokamak(
     rotation_angle: float = 180.0,
     extra_cut_shapes: Sequence[cq.Workplane] = [],
     extra_intersect_shapes: Sequence[cq.Workplane] = [],
-    colors: dict = {}
+    colors: dict = {},
 ) -> Assembly:
     """
     Creates a tokamak fusion reactor from a radial and vertical build.
 
     Args:
         radial_build: sequence of tuples containing the radial build of the
-            reactor. Each tuple should contain a LayerType and a float 
+            reactor. Each tuple should contain a LayerType and a float
         vertical_build: sequence of tuples containing the vertical build of the
-            reactor. Each tuple should contain a LayerType and a float 
+            reactor. Each tuple should contain a LayerType and a float
         triangularity: The triangularity of the plasma. Defaults to 0.55.
         rotation_angle: The rotation angle of the plasma. Defaults to 180.0.
         extra_cut_shapes: A list of extra shapes to cut the reactor with. Defaults to [].
@@ -277,10 +300,14 @@ def tokamak(
 
     for i, entry in enumerate(extra_cut_shapes):
         if isinstance(entry, cq.Workplane):
-            name = f"add_extra_cut_shape_{i+1}"
-            my_assembly.add(entry, name=name, color=cq.Color(*colors.get(name, (0.5,0.5,0.5))))
+            name = f"add_extra_cut_shape_{i + 1}"
+            my_assembly.add(
+                entry, name=name, color=cq.Color(*colors.get(name, (0.5, 0.5, 0.5)))
+            )
         else:
-            raise ValueError(f"extra_cut_shapes should only contain cadquery Workplanes, not {type(entry)}")
+            raise ValueError(
+                f"extra_cut_shapes should only contain cadquery Workplanes, not {type(entry)}"
+            )
 
     # builds up the intersect shapes
     intersect_shapes_to_cut = []
@@ -298,14 +325,20 @@ def tokamak(
         for i, entry in enumerate(extra_intersect_shapes):
             reactor_entry_intersection = entry.intersect(reactor_compound)
             intersect_shapes_to_cut.append(reactor_entry_intersection)
-            name=f"extra_intersect_shapes_{i+1}"
-            my_assembly.add(reactor_entry_intersection, name=name, color=cq.Color(*colors.get(name, (0.5,0.5,0.5))))
+            name = f"extra_intersect_shapes_{i + 1}"
+            my_assembly.add(
+                reactor_entry_intersection,
+                name=name,
+                color=cq.Color(*colors.get(name, (0.5, 0.5, 0.5))),
+            )
 
     # builds just the core if there are no extra parts
     if len(extra_cut_shapes) == 0 and len(intersect_shapes_to_cut) == 0:
-        for i, entry in enumerate(inner_radial_build+blanket_layers):
-            name=f"layer_{i+1}"
-            my_assembly.add(entry, name=name, color=cq.Color(*colors.get(name, (0.5,0.5,0.5))))
+        for i, entry in enumerate(inner_radial_build + blanket_layers):
+            name = f"layer_{i + 1}"
+            my_assembly.add(
+                entry, name=name, color=cq.Color(*colors.get(name, (0.5, 0.5, 0.5)))
+            )
     else:
         shapes_and_components = []
         for i, entry in enumerate(inner_radial_build + blanket_layers):
@@ -317,11 +350,15 @@ def tokamak(
             shapes_and_components.append(entry)
 
         for i, entry in enumerate(shapes_and_components):
-            name=f"layer_{i+1}"
+            name = f"layer_{i + 1}"
             # TODO track the names of shapes, even when extra shapes are made due to splitting
-            my_assembly.add(entry, name=name, color=cq.Color(*colors.get(name, (0.5,0.5,0.5))))
+            my_assembly.add(
+                entry, name=name, color=cq.Color(*colors.get(name, (0.5, 0.5, 0.5)))
+            )
 
-    my_assembly.add(plasma, name="plasma", color=cq.Color(*colors.get("plasma", (0.5,0.5,0.5))))
+    my_assembly.add(
+        plasma, name="plasma", color=cq.Color(*colors.get("plasma", (0.5, 0.5, 0.5)))
+    )
 
     my_assembly.elongation = elongation
     my_assembly.triangularity = triangularity

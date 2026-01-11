@@ -41,7 +41,6 @@ def create_wire_workplane_from_instructions(
     instructions,
     workplane,
 ):
-
     for entry in instructions:
         if list(entry.keys())[0] == "spline":
             workplane = workplane.spline(listOfXYTuple=list(entry.values())[0])
@@ -57,9 +56,7 @@ def create_wire_workplane_from_instructions(
 
 
 def create_wire_workplane_from_points(points, plane, origin=(0, 0, 0), obj=None):
-
     workplane = Workplane(plane, origin=origin, obj=obj)  # offset=extrusion_offset
-
 
     all_straight = all(entry[-1] == "straight" for entry in points)
     all_spline = all(entry[-1] == "spline" for entry in points)
@@ -110,7 +107,11 @@ def sum_up_to_gap_before_plasma(radial_build):
     for i, item in enumerate(radial_build):
         if item[0] == LayerType.PLASMA:
             return total_sum
-        if item[0] == LayerType.GAP and i + 1 < len(radial_build) and radial_build[i + 1][0] == LayerType.PLASMA:
+        if (
+            item[0] == LayerType.GAP
+            and i + 1 < len(radial_build)
+            and radial_build[i + 1][0] == LayerType.PLASMA
+        ):
             return total_sum
         total_sum += item[1]
     return total_sum
@@ -173,11 +174,17 @@ def create_divertor_envelope(divertor_radial_build, blanket_height, rotation_ang
         (divertor_radial_build[0][1], z_value_sigh * blanket_height, "straight"),
         (divertor_radial_build[0][1], 0, "straight"),
         (divertor_radial_build[0][1] + divertor_radial_build[1][1], 0, "straight"),
-        (divertor_radial_build[0][1] + divertor_radial_build[1][1], z_value_sigh * blanket_height, "straight"),
+        (
+            divertor_radial_build[0][1] + divertor_radial_build[1][1],
+            z_value_sigh * blanket_height,
+            "straight",
+        ),
     ]
     points.append(points[0])
 
-    wire = create_wire_workplane_from_points(points=points, plane="XZ", origin=(0, 0, 0), obj=None)
+    wire = create_wire_workplane_from_points(
+        points=points, plane="XZ", origin=(0, 0, 0), obj=None
+    )
 
     divertor_solid = wire.revolve(rotation_angle)
     divertor_solid.name = divertor_name
@@ -214,7 +221,9 @@ def validate_divertor_radial_build(radial_build):
             f"The first entry in the radial build for the divertor should be a LayerType.GAP not {radial_build[0][0]}"
         )
 
-    if not isinstance(radial_build[0][1], (int, float)) or not isinstance(radial_build[1][1], (int, float)):
+    if not isinstance(radial_build[0][1], (int, float)) or not isinstance(
+        radial_build[1][1], (int, float)
+    ):
         raise ValidationError(
             f"The thickness of the gap and the divertor should both be integers or floats, not {type(radial_build[0][1])} and {type(radial_build[1][1])}"
         )
@@ -232,9 +241,13 @@ def validate_plasma_radial_build(radial_build):
     plasma_index = -1
     for index, item in enumerate(radial_build):
         if not isinstance(item[0], LayerType):
-            raise ValidationError(f"First entry in each radial build Tuple should be a paramak.LayerType")
+            raise ValidationError(
+                f"First entry in each radial build Tuple should be a paramak.LayerType"
+            )
         if not isinstance(item[1], (int, float)):
-            raise ValidationError(f"Second entry in each radial build Tuple should be a Float")
+            raise ValidationError(
+                f"Second entry in each radial build Tuple should be a Float"
+            )
         if item[0] not in valid_strings:
             raise ValidationError(f"Invalid entry '{item[0]}' at index {index}")
         if item[1] <= 0:
@@ -245,11 +258,20 @@ def validate_plasma_radial_build(radial_build):
             if plasma_count > 1:
                 raise ValidationError("Multiple LayerType.PLASMA entries found")
     if plasma_count != 1:
-        raise ValidationError("LayerType.PLASMA entry not found or found multiple times")
+        raise ValidationError(
+            "LayerType.PLASMA entry not found or found multiple times"
+        )
     if plasma_index == 0 or plasma_index == len(radial_build) - 1:
-        raise ValidationError("LayerType.PLASMA entry must have at least one entry before and after it")
-    if radial_build[plasma_index - 1][0] != LayerType.GAP or radial_build[plasma_index + 1][0] != LayerType.GAP:
-        raise ValidationError("LayerType.PLASMA entry must be preceded and followed by a LayerType.GAP")
+        raise ValidationError(
+            "LayerType.PLASMA entry must have at least one entry before and after it"
+        )
+    if (
+        radial_build[plasma_index - 1][0] != LayerType.GAP
+        or radial_build[plasma_index + 1][0] != LayerType.GAP
+    ):
+        raise ValidationError(
+            "LayerType.PLASMA entry must be preceded and followed by a LayerType.GAP"
+        )
 
 
 def is_lower_or_upper_divertor(radial_build):
@@ -278,7 +300,10 @@ def get_plasma_index(radial_build):
 def get_gap_after_plasma(radial_build):
     for index, item in enumerate(radial_build):
         if item[0] == LayerType.PLASMA:
-            if index + 1 < len(radial_build) and radial_build[index + 1][0] == LayerType.GAP:
+            if (
+                index + 1 < len(radial_build)
+                and radial_build[index + 1][0] == LayerType.GAP
+            ):
                 return radial_build[index + 1][1]
             else:
                 raise ValueError("LayerType.PLASMA entry is not followed by a 'gap'")
