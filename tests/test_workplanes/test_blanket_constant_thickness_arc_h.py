@@ -25,7 +25,9 @@ def test_relative_shape_volume():
     )
 
     assert test_shape_360.val().Volume() > 1000
-    assert math.isclose(test_shape_360.val().Volume(), 2 * test_shape_180.val().Volume())
+    assert math.isclose(
+        test_shape_360.val().Volume(), 2 * test_shape_180.val().Volume()
+    )
 
     assert len(test_shape_360.val().Faces()) == 4
 

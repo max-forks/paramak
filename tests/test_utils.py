@@ -1,6 +1,7 @@
 import pytest
 
 from paramak.utils import (
+    LayerType,
     ValidationError,
     get_gap_after_plasma,
     get_plasma_value,
@@ -8,7 +9,6 @@ from paramak.utils import (
     sum_up_to_plasma,
     validate_divertor_radial_build,
     validate_plasma_radial_build,
-    LayerType,
 )
 
 
@@ -31,7 +31,9 @@ def test_validate_divertor_radial_build_invalid_tuple_length():
 
 def test_validate_divertor_radial_build_invalid_second_entry():
     radial_build = [(LayerType.GAP, 10), ("divertor", 20)]
-    with pytest.raises(ValidationError, match='should be either "lower_divertor" or "upper_divertor"'):
+    with pytest.raises(
+        ValidationError, match='should be either "lower_divertor" or "upper_divertor"'
+    ):
         validate_divertor_radial_build(radial_build)
 
 
@@ -228,7 +230,8 @@ def test_plasma_not_preceded_by_gap():
         ),
     ]
     with pytest.raises(
-        ValidationError, match="LayerType.PLASMA entry must be preceded and followed by a LayerType.GAP"
+        ValidationError,
+        match="LayerType.PLASMA entry must be preceded and followed by a LayerType.GAP",
     ):
         validate_plasma_radial_build(radial_build)
 
@@ -273,7 +276,8 @@ def test_plasma_not_followed_by_gap():
         ),
     ]
     with pytest.raises(
-        ValidationError, match="LayerType.PLASMA entry must be preceded and followed by a LayerType.GAP"
+        ValidationError,
+        match="LayerType.PLASMA entry must be preceded and followed by a LayerType.GAP",
     ):
         validate_plasma_radial_build(radial_build)
 
@@ -317,7 +321,10 @@ def test_missing_plasma():
             10,
         ),
     ]
-    with pytest.raises(ValidationError, match="LayerType.PLASMA entry not found or found multiple times"):
+    with pytest.raises(
+        ValidationError,
+        match="LayerType.PLASMA entry not found or found multiple times",
+    ):
         validate_plasma_radial_build(radial_build)
 
 
@@ -364,7 +371,9 @@ def test_multiple_plasma():
             10,
         ),
     ]
-    with pytest.raises(ValidationError, match="Multiple LayerType.PLASMA entries found"):
+    with pytest.raises(
+        ValidationError, match="Multiple LayerType.PLASMA entries found"
+    ):
         validate_plasma_radial_build(radial_build)
 
 
@@ -411,7 +420,10 @@ def test_first_entry_not_string():
             10,
         ),
     ]
-    with pytest.raises(ValidationError, match="First entry in each radial build Tuple should be a paramak.LayerType"):
+    with pytest.raises(
+        ValidationError,
+        match="First entry in each radial build Tuple should be a paramak.LayerType",
+    ):
         validate_plasma_radial_build(radial_build)
 
 
@@ -458,7 +470,10 @@ def test_second_entry_not_number():
             10,
         ),
     ]
-    with pytest.raises(ValidationError, match="Second entry in each radial build Tuple should be a Float"):
+    with pytest.raises(
+        ValidationError,
+        match="Second entry in each radial build Tuple should be a Float",
+    ):
         validate_plasma_radial_build(radial_build)
 
 
@@ -505,7 +520,10 @@ def test_invalid_string():
             10,
         ),
     ]
-    with pytest.raises(ValidationError, match="First entry in each radial build Tuple should be a paramak.LayerType"):
+    with pytest.raises(
+        ValidationError,
+        match="First entry in each radial build Tuple should be a paramak.LayerType",
+    ):
         validate_plasma_radial_build(radial_build)
 
 
@@ -553,7 +571,8 @@ def test_plasma_first_entry():
         ),
     ]
     with pytest.raises(
-        ValidationError, match="LayerType.PLASMA entry must have at least one entry before and after it"
+        ValidationError,
+        match="LayerType.PLASMA entry must have at least one entry before and after it",
     ):
         validate_plasma_radial_build(radial_build)
 
@@ -602,7 +621,8 @@ def test_plasma_last_entry():
         ),
     ]
     with pytest.raises(
-        ValidationError, match="LayerType.PLASMA entry must have at least one entry before and after it"
+        ValidationError,
+        match="LayerType.PLASMA entry must have at least one entry before and after it",
     ):
         validate_plasma_radial_build(radial_build)
 
@@ -924,7 +944,9 @@ def test_get_gap_after_plasma_not_followed_by_gap():
             10,
         ),
     ]
-    with pytest.raises(ValueError, match="LayerType.PLASMA entry is not followed by a 'gap'"):
+    with pytest.raises(
+        ValueError, match="LayerType.PLASMA entry is not followed by a 'gap'"
+    ):
         get_gap_after_plasma(radial_build)
 
 

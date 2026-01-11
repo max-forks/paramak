@@ -36,7 +36,9 @@ def cutting_wedge(
     ]
     points.append(points[0])
 
-    wire = create_wire_workplane_from_points(points=points, plane=plane, origin=origin, obj=obj)
+    wire = create_wire_workplane_from_points(
+        points=points, plane=plane, origin=origin, obj=obj
+    )
 
     solid = wire.revolve(
         angleDegrees=rotation_angle,

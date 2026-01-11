@@ -7,7 +7,11 @@ from cadquery import exporters
 import paramak
 
 plasma = paramak.plasma_simplified(
-    major_radius=450, minor_radius=150, triangularity=0.55, elongation=2, rotation_angle=160
+    major_radius=450,
+    minor_radius=150,
+    triangularity=0.55,
+    elongation=2,
+    rotation_angle=160,
 )
 
 test_shape = paramak.blanket_from_plasma(
@@ -28,10 +32,14 @@ def test_faces():
     """creates a blanket using the BlanketFP parametric component and checks
     that a solid with the correct number of faces is created"""
 
-    test_shape = paramak.blanket_from_plasma(thickness=150, start_angle=-90, stop_angle=240, rotation_angle=360)
+    test_shape = paramak.blanket_from_plasma(
+        thickness=150, start_angle=-90, stop_angle=240, rotation_angle=360
+    )
     assert len(test_shape.vals()[0].Faces()) == 4
 
-    test_shape = paramak.blanket_from_plasma(thickness=150, start_angle=-90, stop_angle=240, rotation_angle=180)
+    test_shape = paramak.blanket_from_plasma(
+        thickness=150, start_angle=-90, stop_angle=240, rotation_angle=180
+    )
     assert len(test_shape.vals()[0].Faces()) == 6
 
 
@@ -40,7 +48,9 @@ def test_creation_variable_thickness_from_tuple():
     parametric component when a tuple of thicknesses is passed as an
     argument."""
 
-    test_shape = paramak.blanket_from_plasma(start_angle=-90, stop_angle=240, thickness=(100, 200))
+    test_shape = paramak.blanket_from_plasma(
+        start_angle=-90, stop_angle=240, thickness=(100, 200)
+    )
 
     assert test_shape.vals()[0].Volume() > 1000
 
@@ -50,7 +60,9 @@ def test_creation_variable_thickness_from_2_lists():
     parametric component when a list of angles and a list of thicknesses
     are passed as an argument."""
 
-    test_shape = paramak.blanket_from_plasma(start_angle=-90, stop_angle=240, thickness=[(-90, 240), [10, 30]])
+    test_shape = paramak.blanket_from_plasma(
+        start_angle=-90, stop_angle=240, thickness=[(-90, 240), [10, 30]]
+    )
 
     assert test_shape is not None
 
@@ -63,7 +75,9 @@ def test_creation_variable_thickness_function():
     def thickness(theta):
         return 10 + 0.1 * theta
 
-    test_shape = paramak.blanket_from_plasma(start_angle=-90, stop_angle=240, thickness=thickness)
+    test_shape = paramak.blanket_from_plasma(
+        start_angle=-90, stop_angle=240, thickness=thickness
+    )
 
     assert test_shape.vals()[0].Volume() > 1000
 
@@ -73,7 +87,9 @@ def test_creation_variable_offset_from_tuple():
     parametric component when a tuple of offsets is passed as an
     argument."""
 
-    test_shape = paramak.blanket_from_plasma(thickness=150, start_angle=-90, stop_angle=240, offset_from_plasma=(0, 10))
+    test_shape = paramak.blanket_from_plasma(
+        thickness=150, start_angle=-90, stop_angle=240, offset_from_plasma=(0, 10)
+    )
 
     assert test_shape.vals()[0].Volume() > 1000
 
@@ -84,7 +100,10 @@ def test_creation_variable_offset_from_2_lists():
     passed as an argument."""
 
     test_shape = paramak.blanket_from_plasma(
-        thickness=150, start_angle=90, stop_angle=270, offset_from_plasma=[[270, 100, 90], [0, 5, 10]]
+        thickness=150,
+        start_angle=90,
+        stop_angle=270,
+        offset_from_plasma=[[270, 100, 90], [0, 5, 10]],
     )
 
     assert test_shape is not None
@@ -97,7 +116,10 @@ def test_creation_variable_offset_error():
     def test_different_lengths():
         with pytest.raises(ValueError) as excinfo:
             paramak.blanket_from_plasma(
-                thickness=150, start_angle=90, stop_angle=270, offset_from_plasma=[[270, 100, 90], [0, 5, 10, 15]]
+                thickness=150,
+                start_angle=90,
+                stop_angle=270,
+                offset_from_plasma=[[270, 100, 90], [0, 5, 10, 15]],
             )
         assert "maximum recursion" in str(excinfo.value)
 
@@ -109,7 +131,9 @@ def test_creation_variable_offset_function():
     def offset(theta):
         return 10 + 0.1 * theta
 
-    test_shape = paramak.blanket_from_plasma(thickness=150, start_angle=-90, stop_angle=240, offset_from_plasma=offset)
+    test_shape = paramak.blanket_from_plasma(
+        thickness=150, start_angle=-90, stop_angle=240, offset_from_plasma=offset
+    )
 
     assert test_shape is not None
     assert test_shape.vals()[0].Volume() > 1000
@@ -120,7 +144,9 @@ def test_full_cov_stp_export():
     coverage and checks that an stp file can be exported using the export_stp
     method."""
 
-    test_shape = paramak.blanket_from_plasma(thickness=150, rotation_angle=180, start_angle=0, stop_angle=360)
+    test_shape = paramak.blanket_from_plasma(
+        thickness=150, rotation_angle=180, start_angle=0, stop_angle=360
+    )
 
     exporters.export(test_shape, "test_blanket_full_cov.step")
     assert Path("test_blanket_full_cov.step").exists()
@@ -132,7 +158,9 @@ def test_full_cov_full_rotation():
     coverage and full rotation and checks that an stp file can be exported using
     the export_stp method."""
 
-    test_shape = paramak.blanket_from_plasma(thickness=150, rotation_angle=360, start_angle=0, stop_angle=360)
+    test_shape = paramak.blanket_from_plasma(
+        thickness=150, rotation_angle=360, start_angle=0, stop_angle=360
+    )
 
     exporters.export(test_shape, "test_blanket_full_cov_full_rot.step")
     assert Path("test_blanket_full_cov_full_rot.step").exists()
@@ -142,7 +170,9 @@ def test_full_cov_full_rotation():
 def test_overlapping():
     """Creates an overlapping geometry and checks that a warning is raised."""
 
-    with pytest.warns(UserWarning, match="blanket_from_plasma: Some points with negative R"):
+    with pytest.warns(
+        UserWarning, match="blanket_from_plasma: Some points with negative R"
+    ):
         paramak.blanket_from_plasma(
             major_radius=100,
             minor_radius=100,

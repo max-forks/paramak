@@ -40,7 +40,9 @@ def plasma_simplified(
 
     # parametric equations for plasma
     def R(theta):
-        return major_radius + minor_radius * np.cos(theta + triangularity * np.sin(theta))
+        return major_radius + minor_radius * np.cos(
+            theta + triangularity * np.sin(theta)
+        )
 
     def Z(theta):
         return elongation * minor_radius * np.sin(theta) + vertical_displacement
@@ -50,7 +52,9 @@ def plasma_simplified(
     for point in points:
         point.append("spline")
 
-    wire = create_wire_workplane_from_points(points=points, plane=plane, origin=origin, obj=obj)
+    wire = create_wire_workplane_from_points(
+        points=points, plane=plane, origin=origin, obj=obj
+    )
 
     # avoids shape with surface on join that can't be meshed for 360 degree plasmas
     if rotation_angle >= 360:

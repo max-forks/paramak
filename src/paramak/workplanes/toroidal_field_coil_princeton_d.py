@@ -1,9 +1,11 @@
 import typing
+from typing import List, Tuple
+
 import numpy as np
-from ..utils import create_wire_workplane_from_points, rotate_solid
 from scipy import integrate
 from scipy.optimize import brentq
-from typing import List, Tuple
+
+from ..utils import create_wire_workplane_from_points, rotate_solid
 from ..workplanes.cutting_wedge import cutting_wedge
 
 
@@ -66,7 +68,9 @@ def _compute_inner_points(R1, R2):
     return r_values, z_values
 
 
-def add_thickness(x: List[float], y: List[float], thickness: float, dy_dx: List[float] = None) -> Tuple[list, list]:
+def add_thickness(
+    x: List[float], y: List[float], thickness: float, dy_dx: List[float] = None
+) -> Tuple[list, list]:
     """Computes outer curve points based on thickness
 
     Args:
@@ -194,12 +198,16 @@ def toroidal_field_coil_princeton_d(
     )
     # need to get square end, it appears to miss the last point in the solid, TODO fix so this append is not needed
     points.append(points[-1])
-    wire = create_wire_workplane_from_points(points=points, plane=plane, origin=origin, obj=obj)
+    wire = create_wire_workplane_from_points(
+        points=points, plane=plane, origin=origin, obj=obj
+    )
     solid = wire.extrude(until=distance / 2, both=True)
     solid = rotate_solid(angles=azimuthal_placement_angles, solid=solid)
 
     if with_inner_leg:
-        inner_leg_connection_points = [(x, z, "straight") for x, z in inner_leg_connection_points]
+        inner_leg_connection_points = [
+            (x, z, "straight") for x, z in inner_leg_connection_points
+        ]
         # need to get square end, it appears to miss the last point in the solid, TODO fix so this append is not needed
         inner_leg_connection_points.append(inner_leg_connection_points[-1])
         inner_wire = create_wire_workplane_from_points(
@@ -211,9 +219,15 @@ def toroidal_field_coil_princeton_d(
 
     if rotation_angle < 360.0:
         bb = solid.val().BoundingBox()
-        radius = max(bb.xmax, bb.ymax) * 2.1  # larger than the bounding box to ensure clean cut
-        height = max(bb.zmax, bb.zmin) * 2.1  # larger than the bounding box to ensure clean cut
-        cutting_shape = cutting_wedge(height=height, radius=radius, rotation_angle=rotation_angle)
+        radius = (
+            max(bb.xmax, bb.ymax) * 2.1
+        )  # larger than the bounding box to ensure clean cut
+        height = (
+            max(bb.zmax, bb.zmin) * 2.1
+        )  # larger than the bounding box to ensure clean cut
+        cutting_shape = cutting_wedge(
+            height=height, radius=radius, rotation_angle=rotation_angle
+        )
         solid = solid.intersect(cutting_shape)
 
     solid.name = name

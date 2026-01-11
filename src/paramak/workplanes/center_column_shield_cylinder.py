@@ -37,7 +37,9 @@ def center_column_shield_cylinder(
     elif reference_point[0] == "lower":
         center_height = reference_point[1] + 0.5 * height
     else:
-        raise ValueError('reference_point should be a tuple where the first value is either "center" or "lower"')
+        raise ValueError(
+            'reference_point should be a tuple where the first value is either "center" or "lower"'
+        )
 
     if not isinstance(center_height, (int, float)):
         msg = f"center_height should be a float or int. Not a {type(center_height)}"
@@ -52,7 +54,9 @@ def center_column_shield_cylinder(
 
     points.append(points[0])
 
-    wire = create_wire_workplane_from_points(points=points, plane=plane, origin=origin, obj=obj)
+    wire = create_wire_workplane_from_points(
+        points=points, plane=plane, origin=origin, obj=obj
+    )
 
     solid = wire.revolve(rotation_angle)
     solid.name = name

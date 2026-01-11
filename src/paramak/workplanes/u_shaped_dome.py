@@ -33,7 +33,7 @@ def u_shaped_dome(
     if not isinstance(radius, (float, int)):
         raise ValueError(f"radius must be a number. Not {type(radius)}")
     if radius <= 0:
-        msg = "radius must be a positive number above 0. " f"Not {radius}"
+        msg = f"radius must be a positive number above 0. Not {radius}"
         raise ValueError(msg)
 
     if not isinstance(thickness, (float, int)):
@@ -61,11 +61,17 @@ def u_shaped_dome(
         lower_chord_center_height = reference_point[1] - 0.5 * cylinder_height
         upper_chord_center_height = reference_point[1] + 0.5 * cylinder_height
     elif reference_point[0] == "lower":
-        center_height = reference_point[1] + thickness + dish_height + 0.5 * cylinder_height
+        center_height = (
+            reference_point[1] + thickness + dish_height + 0.5 * cylinder_height
+        )
         lower_chord_center_height = reference_point[1] + thickness + dish_height
-        upper_chord_center_height = reference_point[1] + thickness + dish_height + cylinder_height
+        upper_chord_center_height = (
+            reference_point[1] + thickness + dish_height + cylinder_height
+        )
     else:
-        raise ValueError('reference_point should be a tuple where the first value is either "center" or "lower"')
+        raise ValueError(
+            'reference_point should be a tuple where the first value is either "center" or "lower"'
+        )
 
     cylinder_section = center_column_shield_cylinder(
         height=cylinder_height,
@@ -98,7 +104,9 @@ def u_shaped_dome(
             plane=plane,
         )
     else:
-        raise ValueError(f'upper_or_lower must be either "lower" or "upper" not {upper_or_lower}')
+        raise ValueError(
+            f'upper_or_lower must be either "lower" or "upper" not {upper_or_lower}'
+        )
 
     dome_section.name = name
     cylinder_section.name = name

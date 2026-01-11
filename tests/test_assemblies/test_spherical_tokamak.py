@@ -1,3 +1,4 @@
+import importlib
 from pathlib import Path
 
 import pytest
@@ -6,11 +7,11 @@ import paramak
 
 from .test_utils import transport_particles_on_h5m_geometry
 
-import importlib
-
 
 @pytest.mark.parametrize("rotation_angle", [30, 180])
-@pytest.mark.skipif(not importlib.util.find_spec("cad_to_dagmc"), reason="Skipping transport tests")
+@pytest.mark.skipif(
+    not importlib.util.find_spec("cad_to_dagmc"), reason="Skipping transport tests"
+)
 def test_transport_with_magnets(rotation_angle):
     from cad_to_dagmc import CadToDagmc
 
@@ -23,7 +24,10 @@ def test_transport_with_magnets(rotation_angle):
     ):
         poloidal_field_coils.append(
             paramak.poloidal_field_coil(
-                height=height, width=width, center_point=center_point, rotation_angle=rotation_angle
+                height=height,
+                width=width,
+                center_point=center_point,
+                rotation_angle=rotation_angle,
             )
         )
         poloidal_field_coils.append(
@@ -58,8 +62,12 @@ def test_transport_with_magnets(rotation_angle):
     assert Path(f"spherical_tokamak_with_magnets_{rotation_angle}.step").exists()
 
     my_model = CadToDagmc()
-    material_tags = ["mat1"] * 11  # rear wall is being split into 2 parts by the magnet that is cut out
-    my_model.add_cadquery_object(cadquery_object=my_reactor, material_tags=material_tags)
+    material_tags = [
+        "mat1"
+    ] * 11  # rear wall is being split into 2 parts by the magnet that is cut out
+    my_model.add_cadquery_object(
+        cadquery_object=my_reactor, material_tags=material_tags
+    )
     my_model.export_dagmc_h5m_file(min_mesh_size=2, max_mesh_size=30.0)
 
     h5m_filename = "dagmc.h5m"
@@ -72,7 +80,9 @@ def test_transport_with_magnets(rotation_angle):
     assert flux > 0.0
 
 
-@pytest.mark.skipif(not importlib.util.find_spec("cad_to_dagmc"), reason="Skipping transport tests")
+@pytest.mark.skipif(
+    not importlib.util.find_spec("cad_to_dagmc"), reason="Skipping transport tests"
+)
 def test_transport_without_magnets():
     from cad_to_dagmc import CadToDagmc
 
@@ -98,7 +108,9 @@ def test_transport_without_magnets():
     material_tags = ["mat1"] * 6
     my_model.add_cadquery_object(cadquery_object=reactor, material_tags=material_tags)
 
-    my_model.export_dagmc_h5m_file(filename="dagmc.h5m", min_mesh_size=10.0, max_mesh_size=100.0)
+    my_model.export_dagmc_h5m_file(
+        filename="dagmc.h5m", min_mesh_size=10.0, max_mesh_size=100.0
+    )
 
     flux = transport_particles_on_h5m_geometry(
         h5m_filename="dagmc.h5m",
@@ -107,6 +119,7 @@ def test_transport_without_magnets():
         cross_sections_xml="tests/cross_sections.xml",
     )
     assert flux > 0.0
+
 
 def test_colors():
     "passing in the colors dictionary should not raise an error"
@@ -128,12 +141,13 @@ def test_colors():
         colors={
             "layer_1": (0.4, 0.9, 0.4),
             "layer_2": (0.6, 0.8, 0.6),
-            "plasma": (1., 0.7, 0.8, 0.6),
+            "plasma": (1.0, 0.7, 0.8, 0.6),
             "layer_3": (0.1, 0.1, 0.9),
             "layer_4": (0.4, 0.4, 0.8),
             "layer_5": (0.5, 0.5, 0.8),
         },
     )
+
 
 def test_attributes():
     "passing in the colors dictionary should not raise an error"
